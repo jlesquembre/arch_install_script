@@ -303,8 +303,8 @@ install_video_cards(){
     package_install "mesa-libgl"
     add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
     add_user_to_group ${username} vboxsf
-    system_ctl disable ntpd
-    system_ctl enable vbo
+    systemctl disable ntpd
+    systemctl enable vbo
     VBoxClient-all
   #}}}
   #Bumblebee {{{
@@ -368,9 +368,9 @@ install_video_cards(){
     # Add repository
     aur_package_install "catalyst-test"
     aticonfig --initial --output=/etc/X11/xorg.conf.d/20-radeon.conf
-    system_ctl enable atieventsd
-    system_ctl enable catalyst-hook
-    system_ctl enable temp-links-catalyst
+    systemctl enable atieventsd
+    systemctl enable catalyst-hook
+    systemctl enable temp-links-catalyst
   #}}}
   #ATI {{{
   elif [[ ${VIDEO_DRIVER} == ati ]]; then
@@ -453,10 +453,10 @@ do
         pause_function
 
         package_install "openssh"
-        system_ctl enable sshd
+        systemctl enable sshd
         pause_function
 
-        package_install "xorg-server xorg-server-utils xorg-xinit"
+        package_install "freetype2 xorg-server xorg-server-utils xorg-xinit"
         package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard"
         package_install "mesa"
         # package_install "gamin"
@@ -478,22 +478,22 @@ do
         #package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
         package_install "xdg-user-dirs"
         #config_xinitrc "startxfce4"
-        system_ctl enable upower
+        systemctl enable upower
         pause_function
 
         package_install "lightdm-kde-greeter lightdm accountsservice"
-        system_ctl enable lightdm
+        systemctl enable lightdm
         pause_function
 
         package_install "networkmanager dnsmasq network-manager-applet networkmanager-dispatcher-ntpd"
-        system_ctl enable NetworkManager
+        systemctl enable NetworkManager
         pause_function
 
         print_title "WIFI"
         read -p "Install wicd (wifi support)? [y/N]: " OPT
         if [[ $OPT == "y" ]]; then
             package_install "wicd wicd-gtk"
-            system_ctl enable wicd
+            systemctl enable wicd
             pause_function
         fi
 
@@ -524,7 +524,7 @@ do
 
         package_install "mariadb"
         #/usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
-        #system_ctl enable mysqld
+        #systemctl enable mysqld
         #systemctl start mysqld
         #/usr/bin/mysql_secure_installation
         pause_function
