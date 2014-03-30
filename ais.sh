@@ -130,6 +130,12 @@ package_install() { #{{{
 } #}}}
 
 
+check_archlinux() { #{{{
+  if [[ ! -e /etc/arch-release ]]; then
+    error_msg "ERROR! You must execute the script on Arch Linux."
+  fi
+} #}}}
+
 check_hostname() { #{{{
   if [[ `echo ${HOSTNAME} | sed 's/ //g'` == "" ]]; then
     error_msg "ERROR! Hostname is not configured."
