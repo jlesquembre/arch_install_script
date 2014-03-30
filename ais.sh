@@ -133,6 +133,8 @@ package_install() { #{{{
   for PKG in ${1}; do
     if ! is_package_installed "${PKG}" ; then
       pacman -S ${PKG}
+    else
+      echo "${PKG} already installed!"
     fi
   done
 } #}}}
@@ -406,7 +408,7 @@ ARCHI=`uname -m`
 
 while true
 do
-  print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
+  print_title "ARCHLINUX INSTALL"
   echo " 1) Add user"
   echo " 2) Basic Setup"
   echo " 3) Install extras"
