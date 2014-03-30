@@ -131,7 +131,9 @@ is_package_installed() { #{{{
 package_install() { #{{{
   #install packages using pacman
   for PKG in ${1}; do
-    pacman -S ${PKG}
+    if ! is_package_installed "${PKG}" ; then
+      pacman -S ${PKG}
+    fi
   done
 } #}}}
 
