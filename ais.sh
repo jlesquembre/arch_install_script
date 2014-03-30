@@ -50,6 +50,30 @@ print_title() { #{{{
   echo ""
 } #}}}
 
+
+add_line() { #{{{
+  ADD_LINE=${1}
+  FILEPATH=${2}
+  CHECK_LINE=`grep -F "${ADD_LINE}" ${FILEPATH}`
+  [[ -z $CHECK_LINE ]] && echo "${ADD_LINE}" >> ${FILEPATH}
+} #}}}
+
+
+replace_line() { #{{{
+  SEARCH=${1}
+  REPLACE=${2}
+  FILEPATH=${3}
+  FILEBASE=`basename ${3}`
+
+  sed -e "s/${SEARCH}/${REPLACE}/" ${FILEPATH} > /tmp/${FILEBASE} 2>"$LOG"
+  if [[ ${?} -eq 0 ]]; then
+    mv /tmp/${FILEBASE} ${FILEPATH}
+  else
+    cecho "failed: ${SEARCH} - ${FILEPATH}"
+  fi
+} #}}}
+
+
 system_upgrade() { #{{{
   pacman -Syu
 } #}}}
@@ -160,12 +184,186 @@ create_new_user(){
 #}}}
 
 
+# ENABLE MULTILIB REPOSITORY {{{
+add_multilib(){
+# this option will avoid any problem with packages install
+if [[ $ARCHI == x86_64 ]]; then
+  local MULTILIB=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
+  if [[ -z $MULTILIB ]]; then
+    echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+    echo -e '\nMultilib repository added into pacman.conf file'
+  else
+    sed -i "${MULTILIB}s/^#//" /etc/pacman.conf
+    local MULTILIB=$(( $MULTILIB + 1 ))
+    sed -i "${MULTILIB}s/^#//" /etc/pacman.conf
+  fi
+fi
+}
+#}}}
+
+check_vga() { #{{{
+  # Determine video chipset - only Intel, ATI and nvidia are supported by this script"
+  ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Detecting video chipset "
+  local VGA=`lspci | grep VGA | tr "[:upper:]" "[:lower:]"`
+  local VGA_NUMBER=`lspci | grep VGA | wc -l`
+
+  if [[ -n $(dmidecode --type 1 | grep VirtualBox) ]]; then
+    cecho Virtualbox
+    VIDEO_DRIVER="virtualbox"
+  elif [[ $VGA_NUMBER -eq 2 ]] && [[ -n $(echo ${VGA} | grep "nvidia") || -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
+    cecho Bumblebee
+    VIDEO_DRIVER="bumblebee"
+  elif [[ -n $(echo ${VGA} | grep "nvidia") || -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
+    cecho Nvidia
+    read_input_text "Install NVIDIA proprietary driver" $PROPRIETARY_DRIVER
+    if [[ $OPTION == y ]]; then
+      VIDEO_DRIVER="nvidia"
+    else
+      VIDEO_DRIVER="nouveau"
+    fi
+  elif [[ -n $(echo ${VGA} | grep "advanced micro devices") || -f /sys/kernel/debug/dri/0/radeon_pm_info || -f /sys/kernel/debug/dri/0/radeon_sa_info ]]; then
+    cecho AMD/ATI
+    read_input_text "Install ATI proprietary driver" $PROPRIETARY_DRIVER
+    if [[ $OPTION == y ]]; then
+      VIDEO_DRIVER="catalyst"
+    else
+      VIDEO_DRIVER="ati"
+    fi
+  elif [[ -n $(echo ${VGA} | grep "intel corporation") || -f /sys/kernel/debug/dri/0/i915_capabilities ]]; then
+    cecho Intel
+    VIDEO_DRIVER="intel"
+  else
+    cecho VESA
+    VIDEO_DRIVER="vesa"
+  fi
+  OPTION="y"
+  [[ $VIDEO_DRIVER == intel || $VIDEO_DRIVER == vesa ]] && read -p "Confirm video driver: $VIDEO_DRIVER [Y/n]" OPTION
+  if [[ $OPTION == n ]]; then
+    read -p "Type your video driver [ex: sis, fbdev, modesetting]: " VIDEO_DRIVER
+  fi
+} #}}}
+
+
+#VIDEO CARDS {{{
+install_video_cards(){
+  package_install "dmidecode"
+  print_title "VIDEO CARD"
+  check_vga
+  #Virtualbox {{{
+  if [[ ${VIDEO_DRIVER} == virtualbox ]]; then
+    package_install "virtualbox-guest-utils"
+    package_install "mesa-libgl"
+    add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
+    add_user_to_group ${username} vboxsf
+    system_ctl disable ntpd
+    system_ctl enable vbo
+    VBoxClient-all
+  #}}}
+  #Bumblebee {{{
+  elif [[ ${VIDEO_DRIVER} == bumblebee ]]; then
+    XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
+    [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
+    is_package_installed "nouveau-dri" && pacman -Rdds --noconfirm nouveau-dri
+    pacman -S --needed intel-dri xf86-video-intel bumblebee nvidia
+    package_install "pangox-compat" #fix nvidia-settings
+    package_install "libva-vdpau-driver"
+    if [[ ${ARCHI} == x86_64 ]]; then
+      is_package_installed "lib32-nouveau-dri" && pacman -Rdds --noconfirm lib32-nouveau-dri
+      pacman -S --needed lib32-nvidia-utils lib32-intel-dri
+    fi
+    replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
+    replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
+    mkinitcpio -p linux
+    gpasswd -a ${username} bumblebee
+  #}}}
+  #NVIDIA {{{
+  elif [[ ${VIDEO_DRIVER} == nvidia ]]; then
+    XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
+    [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
+    is_package_installed "nouveau-dri" && pacman -Rdds --noconfirm nouveau-dri
+    pacman -S --needed nvidia{,-utils}
+    package_install "pangox-compat" #fix nvidia-settings
+    package_install "libva-vdpau-driver"
+    if [[ ${ARCHI} == x86_64 ]]; then
+      is_package_installed "lib32-nouveau-dri" && pacman -Rdds --noconfirm lib32-nouveau-dri
+      pacman -S --needed "lib32-nvidia-utils"
+    fi
+    replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
+    replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
+    mkinitcpio -p linux
+    nvidia-xconfig --add-argb-glx-visuals --allow-glx-with-composite --composite -no-logo --render-accel -o /etc/X11/xorg.conf.d/20-nvidia.conf;
+  #}}}
+  #Nouveau [NVIDIA] {{{
+  elif [[ ${VIDEO_DRIVER} == nouveau ]]; then
+    is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils}
+    [[ -f /etc/X11/xorg.conf.d/20-nvidia.conf ]] && rm /etc/X11/xorg.conf.d/20-nvidia.conf
+    package_install "mesa-libgl"
+    package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
+    if [[ ${ARCHI} == x86_64 ]]; then
+      is_package_installed "lib32-nvidia-utils" && pacman -Rdds --noconfirm lib32-nvidia-utils
+      pacman -S --needed "lib32-${VIDEO_DRIVER}-dri"
+    fi
+    replace_line '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
+    replace_line '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
+    mkinitcpio -p linux
+  #}}}
+  #Catalyst [ATI] {{{
+  elif [[ ${VIDEO_DRIVER} == catalyst ]]; then
+    XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
+    [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
+    is_package_installed "ati-dri" && pacman package_remove "ati-dri"
+    [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
+    if [[ ${ARCHI} == x86_64 ]]; then
+      is_package_installed "lib32-ati-dri" && pacman -Rdds --noconfirm lib32-ati-dri
+    fi
+    package_install "linux-headers"
+    # Add repository
+    aur_package_install "catalyst-test"
+    aticonfig --initial --output=/etc/X11/xorg.conf.d/20-radeon.conf
+    system_ctl enable atieventsd
+    system_ctl enable catalyst-hook
+    system_ctl enable temp-links-catalyst
+  #}}}
+  #ATI {{{
+  elif [[ ${VIDEO_DRIVER} == ati ]]; then
+    is_package_installed "catalyst-test" && pacman -Rdds --noconfirm catalyst-test
+    package_install "mesa-libgl"
+    [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
+    [[ -f /etc/modules-load.d/catalyst.conf ]] && rm /etc/modules-load.d/ati.conf
+    package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
+    if [[ ${ARCHI} == x86_64 ]]; then
+      is_package_installed "lib32-catalyst-utils" && pacman -Rdds --noconfirm lib32-catalyst-utils
+      package_install "lib32-${VIDEO_DRIVER}-dri"
+    fi
+    add_module "radeon" "ati"
+  #}}}
+  #Intel {{{
+  elif [[ ${VIDEO_DRIVER} == intel ]]; then
+    package_install "xf86-video-intel intel-dri libva-intel-driver"
+    package_install "mesa-libgl"
+    [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl"
+  #}}}
+  #Vesa {{{
+  else
+    package_install "xf86-video-${VIDEO_DRIVER}"
+    package_install "mesa-libgl"
+    [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl"
+  fi
+  #}}}
+  pause_function
+}
+#}}}
+
+
+
+ARCHI=`uname -m`
+
 while true
 do
   print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
   echo " 1) "Add user")"
   echo " 2) "Basic Setup")"
-  echo ""
+  echo " 3) Install extras"
   echo " q) Quit"
   echo ""
   MAINMENU+=" q"
@@ -180,10 +378,107 @@ do
         check_hostname
         check_connection
         check_pacman_blocked
+        add_multilib
         system_upgrade
         configure_sudo
         ;;
       3)
+        package_install "ntp"
+        is_package_installed "ntp" && timedatectl set-ntp true
+        pause_function
+
+        package_install "zip unzip unrar p7zip"
+        pause_function
+
+        package_install "alsa-utils alsa-plugins"
+        [[ ${ARCHI} == x86_64 ]] && package_install "lib32-alsa-plugins"
+        pause_function
+
+        package_install "pulseaudio pulseaudio-alsa"
+        [[ ${ARCHI} == x86_64 ]] && package_install "lib32-libpulse"
+        # automatically switch to newly-connected devices
+        add_line "load-module module-switch-on-connect" "/etc/pulse/default.pa"
+        pause_function
+
+        package_install "openssh"
+        system_ctl enable sshd
+        pause_function
+
+        package_install "xorg-server xorg-server-utils xorg-xinit"
+        package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard"
+        package_install "mesa"
+        # package_install "gamin"
+        KEYMAP=$(localectl status | grep Keymap | awk '{print $3}')
+        localectl set-keymap ${KEYMAP}
+        pause_function
+
+        install_video_cards
+
+        package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
+        package_install "git rxvt-unicode rxvt-unicode-terminfo urxvt-perls fish"
+        pause_function
+
+
+        package_install "upower i3-wm"
+        pause_function
+
+        package_install "xfce4 xfce4-goodies"
+        #package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
+        package_install "xdg-user-dirs"
+        #config_xinitrc "startxfce4"
+        system_ctl enable upower
+        pause_function
+
+        package_install "lightdm-kde-greeter lightdm accountsservice"
+        system_ctl enable lightdm
+        pause_function
+
+        package_install "networkmanager dnsmasq network-manager-applet networkmanager-dispatcher-ntpd"
+        system_ctl enable NetworkManager
+        pause_function
+
+        print_title "WIFI"
+        read -p "Install wicd (wifi support)? [y/N]: " OPT
+        if [[ $OPT == "y" ]]; then
+            package_install "wicd wicd-gtk"
+            system_ctl enable wicd
+            pause_function
+        fi
+
+        package_install "udiskie notify-osd gphoto2 conky"
+        pause_function
+
+        package_install "ranger atool file w3m"
+        pause_function
+
+        package_install "gvim ctags"
+        pause_function
+
+        package_install "chromium firefox"
+        pause_function
+
+        package_install "icedtea-web-java7"
+        pause_function
+
+        package_install "gst-plugins-base gst-plugins-base-libs gst-plugins-good gst-plugins-bad gst-plugins-ugly gst-libav"
+        package_install "gstreamer0.10 gstreamer0.10-plugins"
+        pause_function
+
+        package_install "kdepim-akregator amarok kid3-qt kdegraphics-okular"
+        pause_function
+
+        package_install "vlc mpv"
+        pause_function
+
+        package_install "mariadb"
+        #/usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+        #system_ctl enable mysqld
+        #systemctl start mysqld
+        #/usr/bin/mysql_secure_installation
+        pause_function
+
+
+
         ;;
 
       "q")
