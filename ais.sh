@@ -104,6 +104,12 @@ read_input_options() { #{{{
   OPTIONS=("${packages[@]}")
 } #}}}
 
+invalid_option() { #{{{
+  print_line
+  echo "Invalid option. Try another one."
+  pause_function
+} #}}}
+
 
 system_upgrade() { #{{{
   pacman -Syu
@@ -418,6 +424,7 @@ do
         add_multilib
         system_upgrade
         configure_sudo
+        pause_function
         ;;
       3)
         package_install "bash-completion"
@@ -522,7 +529,7 @@ do
         ;;
 
       "q")
-        finish
+        exit 0
         ;;
       *)
         invalid_option
