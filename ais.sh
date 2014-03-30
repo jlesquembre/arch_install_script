@@ -456,7 +456,7 @@ do
         systemctl enable sshd
         pause_function
 
-        package_install "freetype2 xorg-server xorg-server-utils xorg-xinit"
+        package_install "xorg-server xorg-server-utils xorg-xinit"
         package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard"
         package_install "mesa"
         # package_install "gamin"
