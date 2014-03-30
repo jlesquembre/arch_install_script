@@ -211,8 +211,8 @@ configure_sudo(){
   if ! is_package_installed "sudo" ; then
     print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
     package_install "sudo"
-    sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
   fi
+  sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
 }
 #}}}
 
@@ -241,6 +241,7 @@ if [[ $ARCHI == x86_64 ]]; then
     sed -i "${MULTILIB}s/^#//" /etc/pacman.conf
   fi
 fi
+sed -i '/#Color/s/^#//' /etc/pacman.conf
 }
 #}}}
 
