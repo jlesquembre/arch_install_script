@@ -361,8 +361,8 @@ ARCHI=`uname -m`
 while true
 do
   print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
-  echo " 1) "Add user")"
-  echo " 2) "Basic Setup")"
+  echo " 1) Add user"
+  echo " 2) Basic Setup"
   echo " 3) Install extras"
   echo " q) Quit"
   echo ""
@@ -383,6 +383,9 @@ do
         configure_sudo
         ;;
       3)
+        package_install "bash-completion"
+        pause_function
+
         package_install "ntp"
         is_package_installed "ntp" && timedatectl set-ntp true
         pause_function
