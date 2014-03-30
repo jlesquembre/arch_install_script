@@ -14,6 +14,11 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
+AUI_DIR=`pwd`
+# LOG FILE
+LOG="${AUI_DIR}/`basename ${0}`_error.log"
+[[ -f $LOG ]] && rm -f $LOG
+
 #COMMON FUNCTIONS {{{
 
 error_msg() { #{{{
