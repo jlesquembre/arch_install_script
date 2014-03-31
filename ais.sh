@@ -476,7 +476,7 @@ do
         pause_function
 
 
-        package_install "upower i3-wm"
+        package_install "upower i3-wm dmenu"
         pause_function
 
         package_install "xfce4 xfce4-goodies"
