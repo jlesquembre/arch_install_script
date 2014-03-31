@@ -471,7 +471,7 @@ do
 
         install_video_cards
 
-        package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
+        package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont ttf-inconsolata"
         package_install "git rxvt-unicode rxvt-unicode-terminfo urxvt-perls fish"
         pause_function
 
