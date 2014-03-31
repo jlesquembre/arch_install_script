@@ -486,7 +486,7 @@ do
         systemctl enable upower
         pause_function
 
-        package_install "lightdm-kde-greeter lightdm accountsservice"
+        package_install "lightdm-gtk3-greeter lightdm accountsservice"
         systemctl enable lightdm
         pause_function
 
