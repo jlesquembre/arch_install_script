@@ -480,7 +480,7 @@ do
 
         package_install "xfce4 xfce4-goodies"
         #package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
-        package_install "xdg-user-dirs"
+        #package_install "xdg-user-dirs"
         #config_xinitrc "startxfce4"
         systemctl enable upower
         pause_function
