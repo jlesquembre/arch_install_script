@@ -417,6 +417,8 @@ do
   echo " 1) Add user"
   echo " 2) Basic Setup"
   echo " 3) Install extras"
+  echo " 4) Install basic user cofiguration"
+  echo " 5) Install AUR packages"
   echo " q) Quit"
   echo ""
   MAINMENU+=" q"
@@ -533,10 +535,18 @@ do
         #/usr/bin/mysql_secure_installation
         pause_function
 
-
-
         ;;
 
+      4)
+        read -p "Username: " username
+        if id -u $username >/dev/null 2>&1; then
+            echo "user exists"
+        else
+            echo "User does not exist"
+        fi
+        su -c "cd $HOME && mkdir projects" $username
+
+        ;;
       "q")
         exit 0
         ;;
