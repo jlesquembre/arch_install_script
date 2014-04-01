@@ -475,8 +475,7 @@ do
         package_install "git rxvt-unicode rxvt-unicode-terminfo urxvt-perls fish"
         pause_function
 
-
-        package_install "upower i3-wm dmenu oxygen-gtk2"
+        package_install "upower i3-wm i3lock dmenu oxygen-gtk2"
         pause_function
 
         package_install "xfce4 xfce4-goodies"
