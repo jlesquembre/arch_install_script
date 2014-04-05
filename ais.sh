@@ -506,7 +506,7 @@ do
         package_install "udiskie notify-osd gphoto2 conky"
         pause_function
 
-        package_install "ranger atool file w3m"
+        package_install "ranger atool file w3m pass"
         pause_function
 
         package_install "gvim ctags"
