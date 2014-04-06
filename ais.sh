@@ -501,7 +501,7 @@ do
         package_install "upower i3-wm i3lock dmenu oxygen-gtk2"
         pause_function
 
-        package_install "xfce4 xfce4-goodies"
+        package_install "xfce4 xfce4-goodies qtcurve"
         #package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
         #package_install "xdg-user-dirs"
         #config_xinitrc "startxfce4"
