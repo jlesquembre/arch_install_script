@@ -569,7 +569,7 @@ do
             done
 
             print_title "Clone .vim"
-            rm -r $userhome/.vim
+            rm -rf $userhome/.vim
             git_clone vim .vim
             pause_function
 
