@@ -419,9 +419,14 @@ git_clone() { #{{{
     directory="$userhome/$directory"
   fi
 
-  su -c "git clone https://github.com/jlesquembre/${reponame}.git $directory" $username
+  print_title "Clone $reponame"
+  rm -rf $directory
+
+  su -c "cd $userhome && git clone https://github.com/jlesquembre/${reponame}.git $directory" $username
   su -c "cd $directory && git remote remove origin" $username
   su -c "cd $directory && git remote add origin git@github.com:jlesquembre/${reponame}.git" $username
+
+  pause_function
 
 } #}}}
 
@@ -563,19 +568,11 @@ do
             repos=( arch_install_script blog jlle doc2git invewrapper termite pytag )
             for repo in ${repos[@]}
             do
-              print_title "Clone $repo"
               git_clone $repo
-              pause_function
             done
 
-            print_title "Clone .vim"
-            rm -rf $userhome/.vim
             git_clone vim .vim
-            pause_function
-
-            print_title "Clone dotfiles"
             git_clone dotfiles dotfiles
-            pause_function
 
             su -c "$userhome/dotfiles/create_links.sh" $username
 
