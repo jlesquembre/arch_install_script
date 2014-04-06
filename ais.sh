@@ -180,7 +180,7 @@ check_connection(){ #{{{
       select CONNECTION_TYPE in "${conn_type_list[@]}"; do
         case "$REPLY" in
           1)
-            systemctl enable dhcpcd@${WIRED_DEV}.service
+            systemctl start dhcpcd@${WIRED_DEV}.service
             break
             ;;
           2)
@@ -516,13 +516,13 @@ do
         systemctl enable NetworkManager
         pause_function
 
-        print_title "WIFI"
-        read -p "Install wicd (wifi support)? [y/N]: " OPT
-        if [[ $OPT == "y" ]]; then
-            package_install "wicd wicd-gtk"
-            systemctl enable wicd
-            pause_function
-        fi
+        #print_title "WIFI"
+        #read -p "Install wicd (wifi support)? [y/N]: " OPT
+        #if [[ $OPT == "y" ]]; then
+        #    package_install "wicd wicd-gtk"
+        #    systemctl enable wicd
+        #    pause_function
+        #fi
 
         package_install "udiskie notify-osd gphoto2 conky"
         pause_function
@@ -574,7 +574,9 @@ do
             git_clone vim .vim
             git_clone dotfiles dotfiles
 
+            print_title "Create links"
             su -c "$userhome/dotfiles/create_links.sh" $username
+            pause_function
 
             print_title "Generate SSH key"
             su -c "ssh-keygen -t rsa -b 2048" $username
