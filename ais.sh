@@ -409,6 +409,23 @@ install_video_cards(){
 
 
 
+git_clone() { #{{{
+  #Clone github repositories
+  reponame=${1}
+  directory=${2}
+  if [ -z $directory ]; then
+    directory="$userhome/projects/$reponame"
+  else
+    directory="$userhome/$directory"
+  fi
+
+  su -c "git clone https://github.com/jlesquembre/${reponame}.git $directory" $username
+  su -c "cd $directory && git remote remove origin" $username
+  su -c "cd $directory && git remote add origin git@github.com:jlesquembre/${reponame}.git" $username
+
+} #}}}
+
+
 ARCHI=`uname -m`
 
 while true
@@ -417,8 +434,7 @@ do
   echo " 1) Add user"
   echo " 2) Basic Setup"
   echo " 3) Install extras"
-  echo " 4) Install basic user cofiguration"
-  echo " 5) Install AUR packages"
+  echo " 4) Install basic user configuration"
   echo " q) Quit"
   echo ""
   MAINMENU+=" q"
@@ -540,16 +556,54 @@ do
       4)
         read -p "Username: " username
         if id -u $username >/dev/null 2>&1; then
-            echo "user exists"
-        else
-            echo "User does not exist"
-        fi
-        su -c "cd $HOME && mkdir projects" $username
 
+            userhome=`su -c 'echo $HOME' $username`
+            su -c "mkdir -p $userhome/projects" $username
+
+            repos=( arch_install_script blog jlle doc2git invewrapper termite pytag )
+            for repo in ${repos[@]}
+            do
+              print_title "Clone $repo"
+              git_clone $repo
+              pause_function
+            done
+
+            print_title "Clone .vim"
+            rm -r $userhome/.vim
+            git_clone vim .vim
+            pause_function
+
+            print_title "Clone dotfiles"
+            git_clone dotfiles dotfiles
+            pause_function
+
+            su -c "$userhome/dotfiles/create_links.sh" $username
+
+            print_title "Generate SSH key"
+            su -c "ssh-keygen -t rsa -b 2048" $username
+            pause_function
+
+            print_title "Build AUR packages"
+            su -c "mkdir -p $userhome/aur" $username
+            aur_pkgs=( pew google-talkplugin )
+            for aur_pkg in ${aur_pkgs[@]}
+            do
+              su -c "cd $userhome/aur && fish aur_build $aur_pkg" $username
+              pause_function
+            done
+
+
+        else
+            print_line
+            echo "User does not exist."
+            pause_function
+        fi
         ;;
+
       "q")
         exit 0
         ;;
+
       *)
         invalid_option
         ;;
