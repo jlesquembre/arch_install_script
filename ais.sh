@@ -524,7 +524,7 @@ do
         #    pause_function
         #fi
 
-        package_install "udiskie notify-osd gphoto2 conky"
+        package_install "udiskie notify-osd gphoto2 conky python-setuptools lsb-release"
         pause_function
 
         package_install "ranger atool file w3m pass"
@@ -584,10 +584,10 @@ do
 
             print_title "Build AUR packages"
             su -c "mkdir -p $userhome/aur" $username
-            aur_pkgs=( pew google-talkplugin )
+            aur_pkgs=( python-pew google-talkplugin )
             for aur_pkg in ${aur_pkgs[@]}
             do
-              su -c "cd $userhome/aur && fish aur_build $aur_pkg" $username
+              su -c "cd $userhome/aur && fish -c \"aur_build $aur_pkg\"" $username
               pause_function
             done
 
