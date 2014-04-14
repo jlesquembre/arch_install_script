@@ -546,10 +546,16 @@ do
         package_install "gstreamer0.10 gstreamer0.10-plugins"
         pause_function
 
-        package_install "kdepim-akregator amarok kid3-qt kdegraphics-okular"
+        package_install "kdepim-akregator amarok kid3-qt kdegraphics-okular kdegraphics-gwenview"
         pause_function
 
         package_install "vlc mpv"
+        pause_function
+
+        package_install "autofs sshfs"
+        pause_function
+
+        package_install "ipython"
         pause_function
 
         package_install "mariadb"
