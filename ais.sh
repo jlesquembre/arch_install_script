@@ -530,7 +530,7 @@ do
         package_install "udiskie notify-osd gphoto2 conky python-setuptools lsb-release"
         pause_function
 
-        package_install "ranger atool file w3m pass keychain"
+        package_install "ranger atool file w3m pass keychain rsync"
         pause_function
 
         package_install "gvim ctags"
