@@ -533,7 +533,7 @@ do
         package_install "ranger atool file w3m pass keychain rsync"
         pause_function
 
-        package_install "gvim ctags"
+        package_install "gvim ctags the_silver_searcher"
         pause_function
 
         package_install "chromium firefox"
