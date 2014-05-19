@@ -555,7 +555,7 @@ do
         package_install "autofs sshfs"
         pause_function
 
-        package_install "ipython"
+        package_install "ipython ethtool"
         pause_function
 
         package_install "mariadb"
