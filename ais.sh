@@ -515,17 +515,16 @@ do
         package_install "kdebase-workspace"
         pause_function
 
-        package_install "networkmanager dnsmasq network-manager-applet networkmanager-dispatcher-ntpd"
-        systemctl enable NetworkManager
+        package_install "netctl dhcpcd ifplugd"
+        #systemctl enable NetworkManager
         pause_function
 
-        #print_title "WIFI"
-        #read -p "Install wicd (wifi support)? [y/N]: " OPT
-        #if [[ $OPT == "y" ]]; then
-        #    package_install "wicd wicd-gtk"
-        #    systemctl enable wicd
-        #    pause_function
-        #fi
+        print_title "WIFI"
+        read -p "Install wifi support? [y/N]: " OPT
+        if [[ $OPT == "y" ]]; then
+            package_install "wpa_actiond wpa_supplicant dialog"
+            pause_function
+        fi
 
         package_install "udiskie notify-osd gphoto2 conky python-setuptools lsb-release"
         pause_function
