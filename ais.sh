@@ -526,6 +526,13 @@ do
             pause_function
         fi
 
+        print_title "Intel Microcode update files for Intel CPUs"
+        read -p "Install Intel CPU support? [y/N]: " OPT
+        if [[ $OPT == "y" ]]; then
+            package_install "intel-ucode"
+            pause_function
+        fi
+
         package_install "udiskie notify-osd gphoto2 conky python-setuptools lsb-release"
         pause_function
 
@@ -555,6 +562,9 @@ do
         pause_function
 
         package_install "ipython ethtool"
+        pause_function
+
+        package_install "haveged"
         pause_function
 
         package_install "mariadb"
