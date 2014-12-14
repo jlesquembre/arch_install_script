@@ -565,6 +565,7 @@ do
         pause_function
 
         package_install "haveged"
+        systemctl enable haveged
         pause_function
 
         package_install "mariadb"
