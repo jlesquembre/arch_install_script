@@ -498,7 +498,7 @@ do
         package_install "git tk aspell-en aspell-es rxvt-unicode rxvt-unicode-terminfo urxvt-perls fish"
         pause_function
 
-        package_install "upower i3-wm i3lock dmenu oxygen-gtk2"
+        package_install "upower i3-wm i3lock dmenu"
         pause_function
 
         package_install "xfce4 xfce4-goodies"
@@ -508,15 +508,16 @@ do
         systemctl enable upower
         pause_function
 
-        package_install "lightdm-gtk3-greeter lightdm accountsservice"
+        package_install "lightdm-gtk-greeter lightdm accountsservice"
         systemctl enable lightdm
         pause_function
 
-        package_install "kdebase-workspace"
-        pause_function
 
         package_install "netctl dhcpcd ifplugd"
         #systemctl enable NetworkManager
+        pause_function
+
+        package_install "plasma-meta breeze-kde4 breeze-gtk kde-gtk-config"
         pause_function
 
         print_title "WIFI"
@@ -533,7 +534,7 @@ do
             pause_function
         fi
 
-        package_install "udiskie notify-osd gphoto2 conky python-setuptools lsb-release"
+        package_install "udevil notify-osd zenity gphoto2 conky python-setuptools lsb-release"
         pause_function
 
         package_install "ranger atool file w3m pass keychain rsync"
