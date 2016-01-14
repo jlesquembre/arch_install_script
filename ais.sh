@@ -463,6 +463,9 @@ do
         package_install "bash-completion"
         pause_function
 
+        package_install "base-devel"
+        pause_function
+
         package_install "ntp"
         is_package_installed "ntp" && timedatectl set-ntp true
         pause_function
