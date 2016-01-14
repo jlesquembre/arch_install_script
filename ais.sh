@@ -546,14 +546,11 @@ do
         package_install "chromium firefox weechat"
         pause_function
 
-        package_install "icedtea-web-java7"
-        pause_function
-
         package_install "gst-plugins-base gst-plugins-base-libs gst-plugins-good gst-plugins-bad gst-plugins-ugly gst-libav"
         package_install "gstreamer0.10 gstreamer0.10-plugins"
         pause_function
 
-        package_install "kdepim-akregator amarok kid3-qt kdegraphics-okular kdegraphics-gwenview"
+        package_install "amarok kid3-qt kdegraphics-okular"
         pause_function
 
         package_install "vlc mpv"
