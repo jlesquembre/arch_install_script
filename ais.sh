@@ -501,7 +501,7 @@ do
         package_install "git tk aspell-en aspell-es rxvt-unicode rxvt-unicode-terminfo urxvt-perls fish"
         pause_function
 
-        package_install "upower i3-wm i3lock dmenu"
+        package_install "upower i3-wm i3lock dmenu rofi compton xorg-xwininfo"
         pause_function
 
         package_install "xfce4 xfce4-goodies"
