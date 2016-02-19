@@ -463,7 +463,7 @@ do
         package_install "bash-completion"
         pause_function
 
-        package_install "base-devel pkgbuild-introspection"
+        package_install "base-devel pkgbuild-introspection pkgfile"
         pause_function
 
         package_install "ntp"
@@ -516,7 +516,7 @@ do
         pause_function
 
 
-        package_install "netctl dhcpcd ifplugd"
+        package_install "netctl dhcpcd ifplugd bind-tools"
         #systemctl enable NetworkManager
         pause_function
 
