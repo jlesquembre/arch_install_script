@@ -463,7 +463,7 @@ do
         package_install "bash-completion"
         pause_function
 
-        package_install "base-devel"
+        package_install "base-devel pkgbuild-introspection"
         pause_function
 
         package_install "ntp"
