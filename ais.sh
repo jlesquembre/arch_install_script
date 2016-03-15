@@ -497,7 +497,7 @@ do
 
         install_video_cards
 
-        package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont ttf-inconsolata ttf-hack"
+        package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont ttf-inconsolata ttf-hack noto-fonts noto-fonts-cjk noto-fonts-emoji"
         package_install "git tk aspell-en aspell-es rxvt-unicode rxvt-unicode-terminfo urxvt-perls fish"
         pause_function
 
