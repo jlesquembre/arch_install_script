@@ -501,7 +501,7 @@ do
         package_install "git tk aspell-en aspell-es rxvt-unicode rxvt-unicode-terminfo urxvt-perls fish"
         pause_function
 
-        package_install "upower i3-wm i3lock dmenu rofi compton xorg-xwininfo"
+        package_install "upower i3-wm i3lock dmenu rofi compton xorg-xwininfo volumeicon"
         pause_function
 
         package_install "xfce4 xfce4-goodies"
@@ -553,7 +553,7 @@ do
         package_install "gstreamer0.10 gstreamer0.10-plugins"
         pause_function
 
-        package_install "amarok kid3-qt kdegraphics-okular"
+        package_install "amarok kid3-qt kdegraphics-okular pavucontrol"
         pause_function
 
         package_install "vlc mpv"
@@ -604,7 +604,7 @@ do
 
             print_title "Build AUR packages"
             su -c "mkdir -p $userhome/aur" $username
-            aur_pkgs=( python-pew google-talkplugin )
+            aur_pkgs=( python-pew volnoti-hcchu-git pulseaudio-ctl )
             for aur_pkg in ${aur_pkgs[@]}
             do
               su -c "cd $userhome/aur && fish -c \"aur_build $aur_pkg\"" $username
