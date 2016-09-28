@@ -498,7 +498,7 @@ do
         install_video_cards
 
         package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont ttf-inconsolata ttf-hack noto-fonts noto-fonts-cjk noto-fonts-emoji"
-        package_install "git tk aspell-en aspell-es rxvt-unicode rxvt-unicode-terminfo urxvt-perls fish"
+        package_install "git tk aspell-en aspell-es rxvt-unicode rxvt-unicode-terminfo urxvt-perls fish diff-so-fancy"
         pause_function
 
         package_install "upower i3-wm i3lock dmenu rofi compton xorg-xwininfo volumeicon"
