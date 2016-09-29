@@ -562,7 +562,7 @@ do
         package_install "autofs sshfs"
         pause_function
 
-        package_install "ipython ethtool"
+        package_install "ipython ethtool pygmentize"
         pause_function
 
         package_install "haveged"
