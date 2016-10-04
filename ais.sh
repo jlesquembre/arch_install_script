@@ -498,10 +498,10 @@ do
         install_video_cards
 
         package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont ttf-inconsolata ttf-hack noto-fonts noto-fonts-cjk noto-fonts-emoji"
-        package_install "git tk aspell-en aspell-es rxvt-unicode rxvt-unicode-terminfo urxvt-perls fish diff-so-fancy"
+        package_install "git tk aspell-en aspell-es rxvt-unicode rxvt-unicode-terminfo urxvt-perls fish diff-so-fancy termite termite-terminfo"
         pause_function
 
-        package_install "upower i3-wm i3lock dmenu rofi compton xorg-xwininfo volumeicon"
+        package_install "upower i3-wm i3lock dmenu rofi compton xorg-xwininfo volumeicon powerline-fonts"
         pause_function
 
         package_install "xfce4 xfce4-goodies"
@@ -543,7 +543,7 @@ do
         package_install "ranger atool file w3m pass keychain rsync"
         pause_function
 
-        package_install "gvim ctags the_silver_searcher tig"
+        package_install "gvim ctags the_silver_searcher ripgrep tig neovim python-neovim"
         pause_function
 
         package_install "chromium firefox weechat"
@@ -585,7 +585,7 @@ do
             userhome=`su -c 'echo $HOME' $username`
             su -c "mkdir -p $userhome/projects" $username
 
-            repos=( arch_install_script blog jlle doc2git invewrapper termite pytag )
+            repos=( arch_install_script blog jlle doc2git invewrapper pytag )
             for repo in ${repos[@]}
             do
               git_clone $repo
