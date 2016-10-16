@@ -543,10 +543,13 @@ do
         package_install "ranger atool file w3m pass keychain rsync"
         pause_function
 
-        package_install "gvim ctags the_silver_searcher ripgrep tig neovim python-neovim"
+        package_install "neovim python-neovim ctags the_silver_searcher ripgrep tig"
         pause_function
 
-        package_install "chromium firefox weechat"
+        package_install "fzf mlocate autojump"
+        pause_function
+
+        package_install "chromium firefox"
         pause_function
 
         package_install "gst-plugins-base gst-plugins-base-libs gst-plugins-good gst-plugins-bad gst-plugins-ugly gst-libav"
