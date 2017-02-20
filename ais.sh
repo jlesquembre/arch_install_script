@@ -546,7 +546,7 @@ do
         package_install "neovim python-neovim ctags the_silver_searcher ripgrep tig"
         pause_function
 
-        package_install "fzf mlocate autojump"
+        package_install "fzf mlocate autojump lsof"
         pause_function
 
         package_install "chromium firefox"
